@@ -3,6 +3,8 @@ from inspector.missingness import missingness_summary
 from inspector.bias import group_distribution
 from inspector.drift import detect_drift
 from inspector.fairness import statistical_parity, disparate_impact
+from inspector.openml_loader import load_openml_dataset
+
 
 ref = pd.read_csv("data/reference/sample.csv")
 cur = pd.read_csv("data/raw/sample.csv")
@@ -20,3 +22,5 @@ print("\nFAIRNESS\n")
 print("Statistical parity:", statistical_parity(cur, "gender", "approved"))
 print("Disparate impact:", disparate_impact(cur, "gender", "approved"))
 
+df = load_openml_dataset(61)
+print(df.head())
