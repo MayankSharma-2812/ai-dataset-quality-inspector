@@ -9,36 +9,40 @@ and programs like **European Summer of Code (ESoC)**.
 
 ---
 
-## 🚀 What Problem Does This Solve?
+## 🔍 What Problem Does This Solve?
 
 In real ML systems, models often fail not because of algorithms, but because of:
-- Missing or corrupted data
-- Bias across sensitive groups
-- Silent distribution drift between dataset versions
+- **Missing or corrupted data**
+- **Bias across sensitive groups**
+- **Silent distribution drift between dataset versions**
 
 This tool allows you to:
-- Upload datasets
-- Inspect data quality automatically
-- Compare reference vs current datasets
-- Visualize issues via an interactive UI
+- **Upload datasets**
+- **Inspect data quality automatically**
+- **Compare reference vs current datasets**
+- **Visualize issues via an interactive UI**
 
 ---
 
-## ✨ Key Features
+## 🔑 Key Features
 
 ### 🔍 AI Data Quality Analysis
-- Missing value detection (count & percentage)
-- Group bias inspection
-- Fairness metrics (statistical parity, disparate impact)
-- Dataset drift detection (KS test, PSI, JS divergence)
+- **Missing value detection (count & percentage)**
+- **Group bias inspection**
+- **Fairness metrics (statistical parity, disparate impact)**
+- **Dataset drift detection (KS test, PSI, JS divergence)**
 
 ### 🧠 Explainable & Research-Backed
-- Jupyter notebook (`analysis.ipynb`) explaining:
+- **Jupyter notebook (`analysis.ipynb`) explaining:**
   - Why each metric is used
   - Observations & limitations
-- Clear separation between research and production code
+- **Clear separation between research and production code**
 
 ### 🌐 Backend (FastAPI)
+- **REST API for dataset inspection**
+- **File upload support**
+- **Dataset comparison endpoint**
+- **Ready for automation and integration**
 - REST API for dataset inspection
 - File upload support
 - Dataset comparison endpoint
@@ -162,4 +166,5 @@ CI-based dataset monitoring
 🤝 Contributing
 Contributions are welcome.
 Feel free to open issues or pull requests.
+
 
