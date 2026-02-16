@@ -1,5 +1,13 @@
 import { motion } from "framer-motion";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from "recharts";
 
 export default function MissingnessChart({ data }) {
   // Handle empty or invalid data
@@ -19,7 +27,9 @@ export default function MissingnessChart({ data }) {
         }}
       >
         <h3>Missing Values Visualization</h3>
-        <p style={{ color: "#9CA3AF", marginTop: 20 }}>No data available to visualize</p>
+        <p style={{ color: "#9CA3AF", marginTop: 20 }}>
+          No data available to visualize
+        </p>
       </motion.div>
     );
   }
@@ -43,7 +53,7 @@ export default function MissingnessChart({ data }) {
         color: "white",
         padding: 20,
         borderRadius: 12,
-        marginTop: 20,
+        marginTop: 20
       }}
     >
       <h3>Missing Values Visualization</h3>
@@ -134,4 +144,4 @@ export default function MissingnessChart({ data }) {
       </div>
     </motion.div>
   )
-}
+
