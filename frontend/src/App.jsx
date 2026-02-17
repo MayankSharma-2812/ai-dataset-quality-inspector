@@ -17,24 +17,28 @@ function App() {
     if (!currentFile) return;
     setLoading(true);
 
-    if (comparisonMode && referenceFile) {
-      // Comparison mode
-      const form = new FormData();
-      form.append("reference", referenceFile);
-      form.append("current", currentFile);
+    try {
+      if (comparisonMode && referenceFile) {
+        // Comparison mode
+        const form = new FormData();
+        form.append("reference", referenceFile);
+        form.append("current", currentFile);
 
-      const res = await axios.post("http://127.0.0.1:8000/inspect/compare", form);
-      setResult(res.data);
-    } else {
-      // Single file mode
-      const form = new FormData();
-      form.append("file", currentFile);
+        const res = await axios.post("http://127.0.0.1:8000/inspect/compare", form);
+        setResult(res.data);
+      } else {
+        // Single file mode
+        const form = new FormData();
+        form.append("file", currentFile);
 
-      const res = await axios.post("http://127.0.0.1:8000/inspect", form);
-      setResult(res.data);
+        const res = await axios.post("http://127.0.0.1:8000/inspect", form);
+        setResult(res.data);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -210,7 +214,8 @@ function App() {
             animate={{ opacity: 1, y: 0 }}
             style={{ marginTop: 20, color: "#6B7280" }}
           >
-            🤖 Analyzing dataset with AI…
+            {" "}
+            Analyzing dataset with AI…
           </motion.p>
         )}
 
@@ -258,4 +263,3 @@ function App() {
   );
 }
 
-export default App;

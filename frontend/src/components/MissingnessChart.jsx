@@ -145,3 +145,4 @@ export default function MissingnessChart({ data }) {
     </motion.div>
   )
 
+}
