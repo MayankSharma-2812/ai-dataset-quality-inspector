@@ -204,4 +204,4 @@ export default function ComparisonCard({ referenceData, currentData, drift }) {
       )}
     </motion.div>
   );
-}
+
