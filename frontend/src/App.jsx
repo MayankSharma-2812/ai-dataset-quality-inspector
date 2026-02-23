@@ -14,26 +14,22 @@ function App() {
   const [comparisonMode, setComparisonMode] = useState(false);
 
   const analyze = async () => {
-    if (!currentFile) return;
+    if (!currentFile || (comparisonMode && !referenceFile)) return;
     setLoading(true);
 
     try {
-      if (comparisonMode && referenceFile) {
-        // Comparison mode
-        const form = new FormData();
-        form.append("reference", referenceFile);
-        form.append("current", currentFile);
-
-        const res = await axios.post("http://127.0.0.1:8000/inspect/compare", form);
-        setResult(res.data);
-      } else {
-        // Single file mode
-        const form = new FormData();
-        form.append("file", currentFile);
-
-        const res = await axios.post("http://127.0.0.1:8000/inspect", form);
-        setResult(res.data);
+      const formData = new FormData();
+      formData.append("current", currentFile);
+      if (comparisonMode) {
+        formData.append("reference", referenceFile);
       }
+
+      const res = await axios.post("http://127.0.0.1:8000/inspect", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+      setResult(res.data);
     } catch (error) {
       console.error(error);
     } finally {
