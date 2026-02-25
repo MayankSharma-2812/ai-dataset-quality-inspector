@@ -38,7 +38,7 @@ export default function MissingnessCard({ data }) {
         background: "#111827",
         color: "white",
         padding: 24,
-        borderRadius: 12,
+        borderRadius: 12
       }}
     >
       <h3 style={{
@@ -49,7 +49,7 @@ export default function MissingnessCard({ data }) {
         Missing Values Analysis
       </h3>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 15 }}>
         {sortedData.map((item, index) => (
           <motion.div
             key={item.column}
@@ -62,41 +62,18 @@ export default function MissingnessCard({ data }) {
               borderRadius: 8,
               border: item.missing_percent > 20 ? "1px solid #EF4444" : "1px solid #4B5563",
               display: "flex",
-              justifyContent: "space-between",
+              flexDirection: "column",
               alignItems: "center"
             }}
           >
-            <div style={{ flex: 1 }}>
-              <div style={{
-                fontWeight: "600",
-                fontSize: "14px",
-                marginBottom: 4,
-                wordBreak: "break-word"
-              }}>
-                {item.column}
-              </div>
-              <div style={{
-                color: "#9CA3AF",
-                fontSize: "12px"
-              }}>
-                {item.missing_count.toLocaleString()} missing values
-              </div>
+            <div style={{ fontSize: "14px", fontWeight: "600", marginBottom: 4 }}>
+              {item.column}
             </div>
-
-            <div style={{ textAlign: "right" }}>
-              <div style={{
-                fontSize: "18px",
-                fontWeight: "bold",
-                color: item.missing_percent > 20 ? "#EF4444" : "#10B981"
-              }}>
-                {item.missing_percent.toFixed(2)}%
-              </div>
-              <div style={{
-                fontSize: "11px",
-                color: "#6B7280"
-              }}>
-                {item.missing_percent > 20 ? "High" : item.missing_percent > 5 ? "Medium" : "Low"}
-              </div>
+            <div style={{ fontSize: "12px", color: "#9CA3AF" }}>
+              {item.missing_count.toLocaleString()} missing values
+            </div>
+            <div style={{ fontSize: "11px", color: "#6B7280", marginTop: 4 }}>
+              {item.missing_percent > 20 ? "High" : item.missing_percent > 5 ? "Medium" : "Low"}
             </div>
           </motion.div>
         ))}
@@ -128,3 +105,4 @@ export default function MissingnessCard({ data }) {
     </motion.div>
   );
 }
+
