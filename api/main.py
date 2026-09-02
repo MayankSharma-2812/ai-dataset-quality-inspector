@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import numpy as np
 import json
+import io
 from inspector.missingness import missingness_summary
 from inspector.drift import detect_drift
 from inspector.bias import group_distribution
@@ -42,6 +43,19 @@ def make_serializable(obj):
     return obj
 
 
+def parse_csv_upload(upload_file: UploadFile) -> pd.DataFrame:
+    """Safely read CSV from uploaded file with UTF-8/BOM handling and stripped column names."""
+    try:
+        content = upload_file.file.read()
+        # Decode using utf-8-sig to automatically strip BOM if present
+        text = content.decode("utf-8-sig", errors="replace")
+        df = pd.read_csv(io.StringIO(text))
+        df.columns = [str(col).strip() for col in df.columns]
+        return df
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid CSV file '{upload_file.filename}': {str(e)}")
+
+
 app = FastAPI(
     title="AI Dataset Quality Inspector",
     description="API for inspecting dataset quality — missingness, bias, drift, and fairness.",
@@ -64,11 +78,7 @@ async def health_check():
 @app.post("/inspect")
 async def inspect(file: UploadFile = File(...)):
     """Inspect a single dataset for missing values."""
-    try:
-        df = pd.read_csv(file.file)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Invalid CSV file: {str(e)}")
-
+    df = parse_csv_upload(file)
     missing = missingness_summary(df)
 
     return make_serializable({
@@ -82,15 +92,8 @@ async def inspect_compare(
     current: UploadFile = File(...)
 ):
     """Compare two datasets — reference vs current — for missingness and drift."""
-    try:
-        reference_df = pd.read_csv(reference.file)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Invalid reference CSV file: {str(e)}")
-
-    try:
-        current_df = pd.read_csv(current.file)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Invalid current CSV file: {str(e)}")
+    reference_df = parse_csv_upload(reference)
+    current_df = parse_csv_upload(current)
 
     drift_report = detect_drift(reference_df, current_df)
 
@@ -108,10 +111,10 @@ async def inspect_bias(
     target: str = "approved"
 ):
     """Inspect a dataset for group bias across a sensitive feature."""
-    try:
-        df = pd.read_csv(file.file)
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Invalid CSV file: {str(e)}")
+    df = parse_csv_upload(file)
+
+    feature = feature.strip()
+    target = target.strip()
 
     if feature not in df.columns or target not in df.columns:
         raise HTTPException(

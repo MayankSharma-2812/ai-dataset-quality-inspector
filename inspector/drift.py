@@ -4,18 +4,39 @@ from scipy.spatial.distance import jensenshannon
 
 
 def psi(expected, actual, buckets=10):
-    """Calculate Population Stability Index between two distributions."""
-    def scale_range(arr):
-        counts = np.histogram(arr, bins=buckets)[0]
-        proportions = counts / len(arr)
-        return proportions
+    """
+    Calculate Population Stability Index (PSI) between two distributions
+    using shared, equal-width bin boundaries over the joint range.
+    """
+    if len(expected) == 0 or len(actual) == 0:
+        return 0.0
 
-    e = scale_range(expected)
-    a = scale_range(actual)
-    # Avoid division by zero / log(0) by replacing zeros with small epsilon
-    a = np.where(a == 0, 1e-6, a)
-    e = np.where(e == 0, 1e-6, e)
-    return float(np.sum((a - e) * np.log(a / e)))
+    exp_arr = np.asarray(expected, dtype=float)
+    act_arr = np.asarray(actual, dtype=float)
+
+    # Calculate shared bin boundaries over combined range
+    combined_min = min(np.min(exp_arr), np.min(act_arr))
+    combined_max = max(np.max(exp_arr), np.max(act_arr))
+
+    if combined_min == combined_max:
+        return 0.0
+
+    bins = np.linspace(combined_min, combined_max, buckets + 1)
+
+    # Bin counts
+    e_counts = np.histogram(exp_arr, bins=bins)[0].astype(float)
+    a_counts = np.histogram(act_arr, bins=bins)[0].astype(float)
+
+    # Proportions
+    e_props = e_counts / len(exp_arr)
+    a_props = a_counts / len(act_arr)
+
+    # Avoid division by zero and log(0) with small epsilon
+    e_props = np.where(e_props == 0, 1e-6, e_props)
+    a_props = np.where(a_props == 0, 1e-6, a_props)
+
+    psi_val = np.sum((a_props - e_props) * np.log(a_props / e_props))
+    return float(psi_val)
 
 
 def detect_drift(reference, current, alpha=0.05):
@@ -48,16 +69,19 @@ def detect_drift(reference, current, alpha=0.05):
         # Use consistent bins for JS divergence
         combined_min = min(ref.min(), cur.min())
         combined_max = max(ref.max(), cur.max())
-        bins = np.linspace(combined_min, combined_max, 11)
         
-        ref_hist = np.histogram(ref, bins=bins)[0].astype(float)
-        cur_hist = np.histogram(cur, bins=bins)[0].astype(float)
-        
-        # Normalize to probability distributions
-        ref_hist = ref_hist / ref_hist.sum() if ref_hist.sum() > 0 else ref_hist
-        cur_hist = cur_hist / cur_hist.sum() if cur_hist.sum() > 0 else cur_hist
-        
-        js = float(jensenshannon(ref_hist, cur_hist))
+        if combined_min == combined_max:
+            js = 0.0
+        else:
+            bins = np.linspace(combined_min, combined_max, 11)
+            ref_hist = np.histogram(ref, bins=bins)[0].astype(float)
+            cur_hist = np.histogram(cur, bins=bins)[0].astype(float)
+            
+            # Normalize to probability distributions
+            ref_hist = ref_hist / ref_hist.sum() if ref_hist.sum() > 0 else ref_hist
+            cur_hist = cur_hist / cur_hist.sum() if cur_hist.sum() > 0 else cur_hist
+            
+            js = float(jensenshannon(ref_hist, cur_hist))
 
         is_drifted = bool(ks_p < alpha) or bool(psi_val > 0.2)
         

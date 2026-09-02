@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bias &amp; Fairness | AegisData AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-container": "#03b5d3",
+                      "on-primary": "#1000a9",
+                      "surface-container-low": "#131b2e",
+                      "surface-container": "#171f33",
+                      "secondary-fixed-dim": "#4cd7f6",
+                      "error-container": "#93000a",
+                      "surface-bright": "#31394d",
+                      "outline-variant": "#464554",
+                      "inverse-surface": "#dae2fd",
+                      "on-secondary": "#003640",
+                      "error": "#ffb4ab",
+                      "on-primary-fixed-variant": "#2f2ebe",
+                      "tertiary-fixed-dim": "#ffb783",
+                      "on-error": "#690005",
+                      "on-secondary-fixed-variant": "#004e5c",
+                      "surface-variant": "#2d3449",
+                      "inverse-primary": "#494bd6",
+                      "surface-container-highest": "#2d3449",
+                      "on-primary-fixed": "#07006c",
+                      "surface-dim": "#0b1326",
+                      "on-primary-container": "#0d0096",
+                      "on-tertiary": "#4f2500",
+                      "on-surface-variant": "#c7c4d7",
+                      "primary-container": "#8083ff",
+                      "on-surface": "#dae2fd",
+                      "background": "#0b1326",
+                      "surface-container-lowest": "#060e20",
+                      "on-tertiary-fixed-variant": "#703700",
+                      "on-background": "#dae2fd",
+                      "inverse-on-surface": "#283044",
+                      "on-tertiary-fixed": "#301400",
+                      "surface": "#0b1326",
+                      "outline": "#908fa0",
+                      "surface-container-high": "#222a3d",
+                      "tertiary-fixed": "#ffdcc5",
+                      "on-secondary-container": "#00424e",
+                      "on-error-container": "#ffdad6",
+                      "on-tertiary-container": "#452000",
+                      "on-secondary-fixed": "#001f26",
+                      "surface-tint": "#c0c1ff",
+                      "tertiary-container": "#d97721",
+                      "tertiary": "#ffb783",
+                      "primary": "#c0c1ff",
+                      "primary-fixed": "#e1e0ff",
+                      "primary-fixed-dim": "#c0c1ff",
+                      "secondary-fixed": "#acedff",
+                      "secondary": "#4cd7f6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "container-max": "1440px",
+                      "base": "4px",
+                      "margin-desktop": "32px",
+                      "gutter": "24px"
+              },
+              "fontFamily": {
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "body-lg": ["Inter"],
+                      "data-display": ["JetBrains Mono"],
+                      "label-sm": ["JetBrains Mono"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "data-display": ["18px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "500"}],
+                      "label-sm": ["12px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        /* Base Glass & Glow Utilities */
+        .glass-panel {
+            background-color: rgba(23, 31, 51, 0.6); /* surface-container at 60% */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 24px rgba(3, 181, 211, 0.05); /* subtle cyan glow */
+        }
+        .glass-header-divider {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        /* Gradient Text */
+        .text-gradient-primary {
+            background: linear-gradient(to right, #c0c1ff, #4cd7f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Buttons & Inputs */
+        .btn-primary {
+            background: linear-gradient(to right, #8083ff, #03b5d3);
+            color: white;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2), 0 4px 12px rgba(128, 131, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover {
+            filter: brightness(1.1);
+            transform: translateY(-1px);
+        }
+        .input-dark {
+            background-color: #0b1326; /* background/surface */
+            border: 1px solid #464554; /* outline-variant */
+            color: #dae2fd;
+        }
+        .input-dark:focus {
+            outline: none;
+            border-color: #4cd7f6; /* secondary */
+            box-shadow: 0 0 0 1px #4cd7f6, inset 0 0 8px rgba(76, 215, 246, 0.1);
+        }
+
+        /* Ambient Background Orbs */
+        .bg-orb-1 {
+            position: fixed;
+            top: -10%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            background: radial-gradient(circle, rgba(73, 75, 214, 0.15) 0%, rgba(11, 19, 38, 0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .bg-orb-2 {
+            position: fixed;
+            bottom: -20%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(3, 181, 211, 0.1) 0%, rgba(11, 19, 38, 0) 70%);
+            border-radius: 50%;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* Chart Glows */
+        .chart-bar {
+            background: linear-gradient(to top, rgba(76, 215, 246, 0.2), rgba(76, 215, 246, 0.8));
+            border-top: 2px solid #4cd7f6;
+            box-shadow: 0 -4px 12px rgba(76, 215, 246, 0.2);
+        }
+        .chart-bar-alt {
+            background: linear-gradient(to top, rgba(192, 193, 255, 0.2), rgba(192, 193, 255, 0.8));
+            border-top: 2px solid #c0c1ff;
+            box-shadow: 0 -4px 12px rgba(192, 193, 255, 0.2);
+        }
+
+        /* Gauge */
+        .gauge-ring {
+            stroke: #464554;
+            stroke-width: 8;
+            fill: transparent;
+        }
+        .gauge-value {
+            stroke: #4cd7f6;
+            stroke-width: 8;
+            stroke-linecap: round;
+            fill: transparent;
+            stroke-dasharray: 251.2; /* 2 * pi * r (r=40) */
+            stroke-dashoffset: 62.8; /* 251.2 * (1 - 0.75) for 75% fill */
+            transition: stroke-dashoffset 1s ease-out;
+            filter: drop-shadow(0 0 6px rgba(76, 215, 246, 0.4));
+        }
+        .gauge-threshold {
+            stroke: #ffb4ab; /* error */
+            stroke-width: 2;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-on-surface font-body-md antialiased min-h-screen overflow-x-hidden selection:bg-secondary-container selection:text-on-secondary-container">
+<!-- Ambient Background -->
+<div class="bg-orb-1"></div>
+<div class="bg-orb-2"></div>
+<!-- TopNavBar (Web) -->
+<header class="hidden md:flex fixed top-0 w-full z-50 justify-between items-center px-margin-desktop h-16 bg-surface-container-low/60 backdrop-blur-md border-b border-white/10 shadow-sm transition-colors hover:bg-white/5">
+<div class="flex items-center gap-8">
+<div class="font-headline-md text-headline-md font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+                AegisData v2.0
+            </div>
+<div class="relative w-64 hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[18px]">search</span>
+<input class="w-full pl-9 pr-4 py-1.5 rounded-lg input-dark font-label-sm text-label-sm placeholder:text-on-surface-variant/50" placeholder="Search insights..." type="text"/>
+</div>
+</div>
+<nav class="flex items-center gap-6">
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors px-2 py-1 rounded" href="#">Docs</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors px-2 py-1 rounded" href="#">Support</a>
+<a class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors px-2 py-1 rounded" href="#">CLI</a>
+</nav>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 rounded-full transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+<button class="font-body-md text-body-md text-on-surface-variant hover:text-on-surface px-3 py-1.5 rounded-lg border border-outline-variant hover:bg-white/5 transition-colors">
+                GitHub
+            </button>
+<button class="font-body-md text-body-md btn-primary px-4 py-1.5 rounded-lg">
+                API Settings
+            </button>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-white/10 object-cover" data-alt="A minimalist, futuristic avatar representing an AI system user, glowing cyan lines on a dark blue background, high quality, professional tech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLm4Ua9TUnUzUojT0LKQdgDJPzz7X8PB6B5LDNm-ATSa0t7W_QBC98Zhhn5zyhdbTRTofhq5Gt6u1c9vCRNiIRZHWwPIi_DUQPF0K-RPxixuQsfQ6qOd8oR81rS8P8d1G6M9j0-19WmsvzmiBqsEnQykdK6Grrb0jEPfAx6sRdiuk-EnHMDvSQG6XTmrUeayifZffPQhpXv8ewH25909qMAx46cLXFwSrrJszSqzR9QoPb0zMn_3J7"/>
+</div>
+</header>
+<!-- Main Layout Container -->
+<div class="flex pt-16 h-screen">
+<!-- SideNavBar -->
+<aside class="hidden md:flex fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 flex-col py-6 bg-surface-container/60 backdrop-blur-md border-r border-white/10 shadow-xl z-40">
+<div class="px-6 mb-8 flex items-center gap-4">
+<img alt="System Status" class="w-10 h-10 rounded-lg object-cover" data-alt="A sleek, metallic shield icon with a glowing indigo core, representing a secure and robust AI system status, set against a dark void, ultra-modern." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkK7ITWsRMFkgDlWr3J9E6gSsnHBb1A07LWqy18KuranN7ErRijGkpb1jPpig7bPxY-n_N1OPkemPu_wWJ4rRhtGEHgkrqcpN0y8IUnF5_ZDsVeAV_YfdLxGRDfKhg0rwiPBXSYRJftjPmmJ1FbJ_EOa5Q39btbYRttFtfpBHLcKqpB1E-J6erOtoYJ5pzD8zW9lSdrmBU0rKP5J9yzNvl4LzKv-dJ7u2y7zP2xTT9b55lPxEK_jnr"/>
+<div>
+<h2 class="font-headline-md text-headline-md font-black text-secondary text-[20px] leading-tight">AegisData AI</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Precision Observability</p>
+</div>
+</div>
+<div class="px-4 mb-6">
+<button class="w-full btn-primary py-2 rounded-lg font-body-md text-body-md font-medium flex justify-center items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+                    Run New Audit
+                </button>
+</div>
+<nav class="flex-1 px-3 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 transition-all rounded-lg font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                    Overview
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 transition-all rounded-lg font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined">query_stats</span>
+                    Missingness
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 transition-all rounded-lg font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                    Distribution Drift
+                </a>
+<!-- Active Tab -->
+<a class="flex items-center gap-3 bg-secondary-container/20 text-secondary-fixed-dim border-r-2 border-secondary p-3 rounded-r-lg font-label-sm text-label-sm translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined font-variation-settings: 'FILL' 1;">balance</span>
+                    Bias/Fairness
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 transition-all rounded-lg font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined">database</span>
+                    Raw Data Explorer
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 transition-all rounded-lg font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined">auto_fix_high</span>
+                    AI Remediation
+                </a>
+</nav>
+<div class="px-3 mt-auto space-y-1">
+<div class="border-t border-white/10 my-2 mx-3"></div>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 transition-all rounded-lg font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined">help</span>
+                    Help
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 transition-all rounded-lg font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined">logout</span>
+                    Logout
+                </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 p-margin-mobile md:p-margin-desktop overflow-y-auto">
+<!-- Page Header -->
+<div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Bias, Fairness &amp; Ethical AI Audit</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+                        Monitor model outcomes across sensitive demographics to detect algorithmic discrimination and ensure compliance with ethical guidelines.
+                    </p>
+</div>
+<div class="flex items-center gap-3">
+<span class="flex h-3 w-3 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-secondary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-secondary"></span>
+</span>
+<span class="font-data-display text-label-sm text-secondary tracking-widest uppercase">Live Audit Active</span>
+</div>
+</div>
+<!-- Configuration Selectors (Bento Item 1) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter mb-gutter">
+<!-- Controls Panel -->
+<div class="lg:col-span-12 glass-panel rounded-xl p-6">
+<div class="flex items-center gap-2 mb-4 glass-header-divider pb-3">
+<span class="material-symbols-outlined text-primary">tune</span>
+<h3 class="font-headline-md text-body-lg font-semibold text-on-surface">Audit Parameters</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Sensitive Feature -->
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Sensitive Feature</label>
+<div class="relative">
+<select class="w-full appearance-none input-dark rounded-lg py-2 pl-4 pr-10 font-data-display text-body-md focus:ring-1 focus:ring-secondary">
+<option selected="" value="gender">Gender</option>
+<option value="race">Race</option>
+<option value="age">Age Bracket</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">arrow_drop_down</span>
+</div>
+</div>
+<!-- Target Label -->
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Target Label</label>
+<div class="relative">
+<select class="w-full appearance-none input-dark rounded-lg py-2 pl-4 pr-10 font-data-display text-body-md focus:ring-1 focus:ring-secondary">
+<option selected="" value="hired">Hired (Status)</option>
+<option value="interview">Interview Selected</option>
+<option value="promoted">Promoted</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">arrow_drop_down</span>
+</div>
+</div>
+<!-- Favorable Outcome -->
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Favorable Outcome</label>
+<div class="relative">
+<select class="w-full appearance-none input-dark rounded-lg py-2 pl-4 pr-10 font-data-display text-body-md focus:ring-1 focus:ring-secondary">
+<option selected="" value="yes">Yes (1)</option>
+<option value="no">No (0)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">arrow_drop_down</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Metrics HUD (Bento Row 2) -->
+<!-- Disparate Impact Ratio -->
+<div class="lg:col-span-4 glass-panel rounded-xl p-6 relative overflow-hidden flex flex-col items-center justify-center min-h-[300px]">
+<div class="absolute top-4 left-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">speed</span>
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Disparate Impact Ratio</h3>
+</div>
+<div class="relative w-40 h-40 mt-6">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<!-- Background Ring -->
+<circle class="gauge-ring" cx="50" cy="50" r="40"></circle>
+<!-- Threshold Marker (0.80) -->
+<line class="gauge-threshold" transform="rotate(288 50 50)" x1="50" x2="50" y1="10" y2="2"></line>
+<!-- Value Ring (0.76) -->
+<circle class="gauge-value" cx="50" cy="50" r="40" style="stroke-dashoffset: 60.288;"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-data-display text-headline-lg text-on-surface leading-none">0.76</span>
+<span class="font-label-sm text-[10px] text-error mt-1 flex items-center"><span class="material-symbols-outlined text-[12px] mr-1">warning</span> Below 0.80</span>
+</div>
+</div>
+<div class="mt-4 text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant max-w-[200px]">Ratio of unprivileged to privileged positive outcomes.</p>
+</div>
+</div>
+<!-- Statistical Parity Difference -->
+<div class="lg:col-span-4 glass-panel rounded-xl p-6 flex flex-col min-h-[300px]">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-primary text-[20px]">difference</span>
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Statistical Parity Diff</h3>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="flex items-end gap-2 mb-2">
+<span class="font-data-display text-headline-lg text-on-surface text-5xl">-0.12</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant mb-2">pts</span>
+</div>
+<div class="w-full h-2 bg-surface-bright rounded-full mt-4 overflow-hidden relative">
+<!-- Center Zero Line -->
+<div class="absolute left-1/2 top-0 bottom-0 w-0.5 bg-outline-variant z-10"></div>
+<!-- Bar showing negative difference -->
+<div class="absolute right-1/2 top-0 bottom-0 bg-primary-container" style="width: 24%;"></div>
+</div>
+<div class="flex justify-between mt-2 font-data-display text-[10px] text-outline-variant">
+<span>-0.5</span>
+<span>0</span>
+<span>+0.5</span>
+</div>
+</div>
+<div class="mt-4 border-t border-white/5 pt-4">
+<div class="flex justify-between items-center">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Ideal Range</span>
+<span class="font-data-display text-label-sm text-on-surface">[-0.1, +0.1]</span>
+</div>
+</div>
+</div>
+<!-- Natural Language Interpretation -->
+<div class="lg:col-span-4 glass-panel rounded-xl p-6 flex flex-col min-h-[300px] border-l-4 border-l-error">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-error text-[20px]">psychology_alt</span>
+<h3 class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">AI Interpretation</h3>
+</div>
+<div class="flex-1 flex flex-col gap-4">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed">
+                            The current model exhibits a <strong class="text-error">High Bias Risk</strong> regarding the sensitive feature <code class="bg-surface-bright px-1 py-0.5 rounded text-secondary font-data-display text-[12px]">Gender</code>.
+                        </p>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                            Female applicants are receiving the favorable outcome (Hired) at a rate 24% lower than Male applicants, crossing the 80% rule threshold (DIR = 0.76).
+                        </p>
+<div class="mt-auto bg-error/10 p-3 rounded-lg border border-error/20 flex items-start gap-3">
+<span class="material-symbols-outlined text-error text-[18px] mt-0.5">policy</span>
+<div>
+<span class="block font-label-sm text-label-sm text-error font-medium mb-1">Compliance Warning</span>
+<span class="font-body-md text-[12px] text-on-surface-variant leading-tight block">May violate EEOC guidelines for historical bias reproduction. Remediation recommended before deployment.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Group Breakdown Chart (Bottom Wide Bento) -->
+<div class="lg:col-span-12 glass-panel rounded-xl p-6">
+<div class="flex items-center justify-between mb-8 glass-header-divider pb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">bar_chart</span>
+<h3 class="font-headline-md text-body-lg font-semibold text-on-surface">Favorable Outcome Rate by Group</h3>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-sm bg-secondary"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Male (Privileged)</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-sm bg-primary-container"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Female (Unprivileged)</span>
+</div>
+</div>
+</div>
+<!-- CSS Bar Chart -->
+<div class="relative h-64 w-full flex items-end justify-around px-8 pb-8 pt-4 border-b border-l border-outline-variant/30">
+<!-- Y-Axis Labels -->
+<div class="absolute left-0 top-0 bottom-8 w-8 flex flex-col justify-between items-end pr-2 font-data-display text-[10px] text-outline-variant">
+<span>100%</span>
+<span>75%</span>
+<span>50%</span>
+<span>25%</span>
+<span>0%</span>
+</div>
+<!-- Grid Lines -->
+<div class="absolute left-8 right-0 top-4 h-[1px] bg-white/5"></div>
+<div class="absolute left-8 right-0 top-[calc(25%+3px)] h-[1px] bg-white/5"></div>
+<div class="absolute left-8 right-0 top-[calc(50%+2px)] h-[1px] bg-white/5"></div>
+<div class="absolute left-8 right-0 top-[calc(75%+1px)] h-[1px] bg-white/5"></div>
+<!-- Bars -->
+<div class="flex flex-col items-center gap-2 z-10 w-24 group">
+<div class="font-data-display text-label-sm text-secondary opacity-0 group-hover:opacity-100 transition-opacity">42.5%</div>
+<div class="w-16 chart-bar rounded-t-sm" style="height: 42.5%;"></div>
+<div class="absolute -bottom-6 font-label-sm text-label-sm text-on-surface">Male</div>
+</div>
+<div class="flex flex-col items-center gap-2 z-10 w-24 group">
+<div class="font-data-display text-label-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">32.3%</div>
+<div class="w-16 chart-bar-alt rounded-t-sm" style="height: 32.3%;"></div>
+<div class="absolute -bottom-6 font-label-sm text-label-sm text-on-surface">Female</div>
+</div>
+<div class="flex flex-col items-center gap-2 z-10 w-24 group">
+<div class="font-data-display text-label-sm text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">38.1%</div>
+<div class="w-16 bg-surface-bright border-t-2 border-outline-variant rounded-t-sm" style="height: 38.1%;"></div>
+<div class="absolute -bottom-6 font-label-sm text-label-sm text-on-surface-variant">Non-Binary</div>
+</div>
+</div>
+<div class="mt-8 flex justify-end">
+<button class="font-body-md text-body-md btn-primary px-4 py-2 rounded-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">auto_fix_high</span>
+                            Initiate Remediation
+                        </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

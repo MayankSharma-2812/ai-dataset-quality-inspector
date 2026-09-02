@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Raw Data Explorer - AegisData AI</title>
+<!-- Tailwind CSS Config -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "secondary-container": "#03b5d3",
+                        "on-primary": "#1000a9",
+                        "surface-container-low": "#131b2e",
+                        "surface-container": "#171f33",
+                        "secondary-fixed-dim": "#4cd7f6",
+                        "error-container": "#93000a",
+                        "surface-bright": "#31394d",
+                        "outline-variant": "#464554",
+                        "inverse-surface": "#dae2fd",
+                        "on-secondary": "#003640",
+                        "error": "#ffb4ab",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "tertiary-fixed-dim": "#ffb783",
+                        "on-error": "#690005",
+                        "on-secondary-fixed-variant": "#004e5c",
+                        "surface-variant": "#2d3449",
+                        "inverse-primary": "#494bd6",
+                        "surface-container-highest": "#2d3449",
+                        "on-primary-fixed": "#07006c",
+                        "surface-dim": "#0b1326",
+                        "on-primary-container": "#0d0096",
+                        "on-tertiary": "#4f2500",
+                        "on-surface-variant": "#c7c4d7",
+                        "primary-container": "#8083ff",
+                        "on-surface": "#dae2fd",
+                        "background": "#0b1326",
+                        "surface-container-lowest": "#060e20",
+                        "on-tertiary-fixed-variant": "#703700",
+                        "on-background": "#dae2fd",
+                        "inverse-on-surface": "#283044",
+                        "on-tertiary-fixed": "#301400",
+                        "surface": "#0b1326",
+                        "outline": "#908fa0",
+                        "surface-container-high": "#222a3d",
+                        "tertiary-fixed": "#ffdcc5",
+                        "on-secondary-container": "#00424e",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-container": "#452000",
+                        "on-secondary-fixed": "#001f26",
+                        "surface-tint": "#c0c1ff",
+                        "tertiary-container": "#d97721",
+                        "tertiary": "#ffb783",
+                        "primary": "#c0c1ff",
+                        "primary-fixed": "#e1e0ff",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "secondary-fixed": "#acedff",
+                        "secondary": "#4cd7f6"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    spacing: {
+                        "margin-mobile": "16px",
+                        "container-max": "1440px",
+                        "base": "4px",
+                        "margin-desktop": "32px",
+                        "gutter": "24px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["Inter"],
+                        "data-display": ["JetBrains Mono"],
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "data-display": ["18px", { "lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "500" }],
+                        "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        
+        /* Custom scrollbar for data tables */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.surface-variant');
+            border-radius: theme('borderRadius.DEFAULT');
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.outline-variant');
+        }
+        
+        /* Glow effects */
+        .glass-panel {
+            background: rgba(23, 31, 51, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: border-color 0.3s ease;
+        }
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+        
+        /* Table styles */
+        .data-cell {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .data-row:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+        
+        /* Tooltip */
+        .header-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.2s linear;
+        }
+        .th-hoverable:hover .header-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col overflow-hidden font-body-md text-body-md">
+<!-- Ambient Background -->
+<div class="fixed inset-0 z-[-1] pointer-events-none overflow-hidden">
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary-container/20 rounded-full blur-[120px]"></div>
+<div class="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-secondary-container/10 rounded-full blur-[150px]"></div>
+</div>
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-16 bg-surface-container-low/60 backdrop-blur-md border-b border-white/10 shadow-sm">
+<div class="flex items-center gap-6">
+<span class="font-headline-md text-headline-md font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">AegisData v2.0</span>
+<div class="hidden md:flex items-center gap-4 bg-surface/50 border border-white/10 rounded px-3 py-1.5 focus-within:border-secondary focus-within:shadow-[0_0_8px_rgba(76,215,246,0.3)] transition-all">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">search</span>
+<input class="bg-transparent border-none text-on-surface focus:ring-0 placeholder:text-on-surface-variant/50 w-64 font-data-display text-data-display" placeholder="Search resources..." type="text"/>
+</div>
+</div>
+<div class="hidden md:flex items-center gap-6">
+<div class="flex items-center gap-4">
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors px-3 py-1.5 rounded" href="#">Docs</a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors px-3 py-1.5 rounded" href="#">Support</a>
+<a class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors px-3 py-1.5 rounded" href="#">CLI</a>
+</div>
+<div class="h-6 w-px bg-white/10"></div>
+<div class="flex items-center gap-3">
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors p-1.5 rounded-full" title="notifications">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors p-1.5 rounded-full" title="settings">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors p-1.5 rounded-full" title="download">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors text-sm font-medium px-3 py-1.5 rounded border border-white/10">GitHub</button>
+<button class="bg-gradient-to-r from-primary to-secondary text-surface-container-lowest font-medium px-4 py-1.5 rounded shadow-[0_0_12px_rgba(192,193,255,0.2)] hover:scale-95 duration-150">API Settings</button>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-white/20 object-cover" data-alt="A macro shot of a sleek, abstract geometric sphere glowing softly with cool blue and purple hues against a dark background. High-tech, enterprise AI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpItozTB0rGCl-lo8UjEpYmDxqRDqeZs5acNUyaReGXnDIokQ5I0pDaeKHi0EFWN6d841984rzO3UGfVnFljiovJoDVyORl_8SzUypJDncdiUQ3mKs14IULnLCjUHQ2GlSzKv7y1R8E4VOr5N_yxcg4EnuYfBNoNEaMGdHpSngu1Sa5LI4AgRZ_KbBFM9vbVvKd_xgMuJoqqGudFbJE0GUlxwfbUMveWzyS0sQed225DSq4LtdxkEs"/>
+</div>
+</nav>
+<div class="flex flex-1 pt-16">
+<!-- SideNavBar -->
+<aside class="hidden md:flex fixed left-0 top-0 h-full w-64 flex-col py-6 pt-24 bg-surface-container/60 backdrop-blur-md border-r border-white/10 shadow-xl z-40">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-surface-variant border border-white/10 flex items-center justify-center overflow-hidden">
+<img alt="System Status" class="w-full h-full object-cover opacity-80" data-alt="Abstract rendering of a secure data vault interface, glowing neon lines mapping data flow over a dark, textured obsidian surface. Precision enterprise software feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB48urYs6IxgfLSlPs6pqyp9wm_FoS9Ym8EpqHED_XMQkWtHjjwXX2K2ANz9wJShT3IBtHq3BtveOy_7O5ldvQ44XGP1dmQbKlr4p-l4ELgokYI8c3kaUMQjm4aWFiA16Xm4KmcNY-7qMdO7h4hT3dAg2xaLwMAjMyX0y2goUsf5Jff2Fvc7xjj9qQQT4KsuX4joxnNuVTCmOiqNZyC9BlM8XCtWOOqk0ci3cZw_13sG4g__OyAvaao"/>
+</div>
+<div>
+<h2 class="font-headline-md text-[18px] font-black text-secondary leading-tight">AegisData AI</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Precision Observability</p>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 rounded-lg transition-all font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined">dashboard</span> Overview
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 rounded-lg transition-all font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined">query_stats</span> Missingness
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 rounded-lg transition-all font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined">analytics</span> Distribution Drift
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 rounded-lg transition-all font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined">balance</span> Bias/Fairness
+                </a>
+<!-- Active State -->
+<a class="flex items-center gap-3 bg-secondary-container/20 text-secondary-fixed-dim border-r-2 border-secondary p-3 rounded-r-lg hover:backdrop-brightness-125 translate-x-1 transition-transform font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">database</span> Raw Data Explorer
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 rounded-lg transition-all font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined">auto_fix_high</span> AI Remediation
+                </a>
+</nav>
+<div class="px-6 mt-auto space-y-4">
+<button class="w-full bg-gradient-to-r from-primary/10 to-secondary/10 border border-secondary/30 text-secondary font-label-sm text-label-sm py-2 rounded shadow-[inset_0_0_8px_rgba(76,215,246,0.1)] hover:bg-secondary/10 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">play_arrow</span> Run New Audit
+                </button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant p-2 hover:bg-white/5 hover:text-on-surface rounded transition-all font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-[18px]">help</span> Help
+                    </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-2 hover:bg-white/5 hover:text-on-surface rounded transition-all font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-[18px]">logout</span> Logout
+                    </a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 p-margin-desktop h-[calc(100vh-64px)] overflow-hidden flex flex-col gap-6">
+<!-- Page Header -->
+<header class="flex justify-between items-end shrink-0">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Dataset Explorer: <span class="text-primary-container font-data-display">transaction_logs_v4</span></h1>
+<p class="text-on-surface-variant mt-1 flex items-center gap-2">
+<span class="inline-block w-2 h-2 rounded-full bg-secondary"></span> 1,204,551 rows scanned • 42 columns • Last updated 2m ago
+                    </p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 bg-surface-variant border border-white/10 rounded text-on-surface hover:bg-white/5 transition-colors flex items-center gap-2 font-data-display text-[14px]">
+<span class="material-symbols-outlined text-[18px]">filter_list</span> Filter
+                    </button>
+<button class="px-4 py-2 bg-surface-variant border border-white/10 rounded text-on-surface hover:bg-white/5 transition-colors flex items-center gap-2 font-data-display text-[14px]">
+<span class="material-symbols-outlined text-[18px]">download</span> Export CSV
+                    </button>
+</div>
+</header>
+<!-- Data Table Container (Glassmorphism Bento) -->
+<div class="glass-panel flex-1 rounded-xl flex flex-col overflow-hidden relative">
+<!-- Table Controls / Schema Summary -->
+<div class="flex items-center justify-between p-4 border-b border-white/10 bg-black/20 shrink-0">
+<div class="flex gap-2">
+<span class="px-2 py-1 rounded bg-surface border border-white/10 text-on-surface-variant font-label-sm text-label-sm flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span> num: 24
+                        </span>
+<span class="px-2 py-1 rounded bg-surface border border-white/10 text-on-surface-variant font-label-sm text-label-sm flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span> str: 12
+                        </span>
+<span class="px-2 py-1 rounded bg-surface border border-white/10 text-on-surface-variant font-label-sm text-label-sm flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span> bool: 4
+                        </span>
+<span class="px-2 py-1 rounded bg-surface border border-white/10 text-on-surface-variant font-label-sm text-label-sm flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-inverse-primary"></span> date: 2
+                        </span>
+</div>
+<div class="flex items-center gap-3 text-on-surface-variant font-label-sm text-label-sm">
+<span class="flex items-center gap-1"><span class="w-3 h-3 bg-error-container/30 border border-error/50 rounded-sm inline-block"></span> Missing Value</span>
+<span class="text-white/20">|</span>
+<span>Showing rows 1 - 50</span>
+</div>
+</div>
+<!-- Virtualized Table Area -->
+<div class="flex-1 overflow-auto bg-surface-dim/50">
+<table class="w-full text-left border-collapse font-data-display text-[13px] whitespace-nowrap">
+<thead class="sticky top-0 bg-surface-container-high/90 backdrop-blur z-10 shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
+<tr>
+<th class="p-3 border-b border-r border-white/10 font-medium text-on-surface-variant w-16 text-center">idx</th>
+<!-- Column Headers with Hovers -->
+<th class="p-3 border-b border-r border-white/10 font-medium text-on-surface th-hoverable relative group cursor-help">
+<div class="flex items-center gap-2">
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-secondary/10 text-secondary border border-secondary/20">num</span>
+                                        user_id
+                                    </div>
+<!-- Tooltip -->
+<div class="header-tooltip absolute top-full left-0 mt-2 p-3 bg-surface-container-highest border border-primary/30 rounded shadow-xl z-20 w-48 font-label-sm text-label-sm backdrop-blur-md">
+<div class="flex justify-between mb-1"><span class="text-on-surface-variant">Min</span><span class="text-on-surface">10004</span></div>
+<div class="flex justify-between mb-1"><span class="text-on-surface-variant">Max</span><span class="text-on-surface">99402</span></div>
+<div class="flex justify-between mb-1"><span class="text-on-surface-variant">Mean</span><span class="text-on-surface">45201.5</span></div>
+<div class="flex justify-between"><span class="text-on-surface-variant">Std</span><span class="text-on-surface">1240.2</span></div>
+</div>
+</th>
+<th class="p-3 border-b border-r border-white/10 font-medium text-on-surface th-hoverable relative group cursor-help">
+<div class="flex items-center gap-2">
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-inverse-primary/10 text-inverse-primary border border-inverse-primary/20">date</span>
+                                        timestamp
+                                    </div>
+<div class="header-tooltip absolute top-full left-0 mt-2 p-3 bg-surface-container-highest border border-primary/30 rounded shadow-xl z-20 w-56 font-label-sm text-label-sm">
+<div class="flex justify-between mb-1"><span class="text-on-surface-variant">Min</span><span class="text-on-surface">2023-10-01T00:00</span></div>
+<div class="flex justify-between"><span class="text-on-surface-variant">Max</span><span class="text-on-surface">2023-10-01T23:59</span></div>
+</div>
+</th>
+<th class="p-3 border-b border-r border-white/10 font-medium text-on-surface th-hoverable relative group cursor-help">
+<div class="flex items-center gap-2">
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-tertiary/10 text-tertiary border border-tertiary/20">str</span>
+                                        event_type
+                                    </div>
+<div class="header-tooltip absolute top-full left-0 mt-2 p-3 bg-surface-container-highest border border-primary/30 rounded shadow-xl z-20 w-48 font-label-sm text-label-sm">
+<div class="text-on-surface-variant mb-1">Top Values:</div>
+<div class="flex justify-between mb-1"><span>login</span><span class="text-secondary">45%</span></div>
+<div class="flex justify-between mb-1"><span>purchase</span><span class="text-secondary">30%</span></div>
+<div class="flex justify-between"><span>view</span><span class="text-secondary">25%</span></div>
+</div>
+</th>
+<th class="p-3 border-b border-r border-white/10 font-medium text-on-surface th-hoverable relative group cursor-help bg-error-container/10 border-b-error/50">
+<div class="flex items-center gap-2">
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-secondary/10 text-secondary border border-secondary/20">num</span>
+                                        amount_usd
+                                        <span class="material-symbols-outlined text-[14px] text-error" title="High Missingness">warning</span>
+</div>
+<div class="header-tooltip absolute top-full left-0 mt-2 p-3 bg-surface-container-highest border border-error/50 rounded shadow-xl z-20 w-48 font-label-sm text-label-sm">
+<div class="text-error font-medium mb-2 border-b border-error/20 pb-1">Missing: 12.4%</div>
+<div class="flex justify-between mb-1"><span class="text-on-surface-variant">Min</span><span class="text-on-surface">0.00</span></div>
+<div class="flex justify-between mb-1"><span class="text-on-surface-variant">Max</span><span class="text-on-surface">9450.50</span></div>
+<div class="flex justify-between mb-1"><span class="text-on-surface-variant">Mean</span><span class="text-on-surface">142.30</span></div>
+<div class="flex justify-between"><span class="text-on-surface-variant">Std</span><span class="text-on-surface">45.10</span></div>
+</div>
+</th>
+<th class="p-3 border-b border-r border-white/10 font-medium text-on-surface th-hoverable relative group cursor-help">
+<div class="flex items-center gap-2">
+<span class="px-1.5 py-0.5 rounded text-[10px] bg-primary-container/10 text-primary-container border border-primary-container/20">bool</span>
+                                        is_fraud
+                                    </div>
+<div class="header-tooltip absolute top-full left-0 mt-2 p-3 bg-surface-container-highest border border-primary/30 rounded shadow-xl z-20 w-40 font-label-sm text-label-sm">
+<div class="flex justify-between mb-1"><span>False</span><span class="text-secondary">99.8%</span></div>
+<div class="flex justify-between"><span>True</span><span class="text-error">0.2%</span></div>
+</div>
+</th>
+</tr>
+</thead>
+<tbody class="text-on-surface-variant">
+<!-- Rows generated manually for visual representation -->
+<tr class="data-row">
+<td class="p-3 data-cell text-center text-white/30">0</td>
+<td class="p-3 data-cell text-secondary-fixed-dim">48291</td>
+<td class="p-3 data-cell">2023-10-01T14:23:01Z</td>
+<td class="p-3 data-cell text-tertiary">"purchase"</td>
+<td class="p-3 data-cell">145.99</td>
+<td class="p-3 data-cell text-primary-container">false</td>
+</tr>
+<tr class="data-row">
+<td class="p-3 data-cell text-center text-white/30">1</td>
+<td class="p-3 data-cell text-secondary-fixed-dim">10042</td>
+<td class="p-3 data-cell">2023-10-01T14:23:05Z</td>
+<td class="p-3 data-cell text-tertiary">"login"</td>
+<!-- Missing value visual -->
+<td class="p-3 data-cell bg-error-container/20 text-error/70 italic relative">
+                                    NaN
+                                    <div class="absolute inset-0 border border-error/30 pointer-events-none"></div>
+</td>
+<td class="p-3 data-cell text-primary-container">false</td>
+</tr>
+<tr class="data-row">
+<td class="p-3 data-cell text-center text-white/30">2</td>
+<td class="p-3 data-cell text-secondary-fixed-dim">99301</td>
+<td class="p-3 data-cell">2023-10-01T14:23:12Z</td>
+<td class="p-3 data-cell text-tertiary">"view"</td>
+<td class="p-3 data-cell">0.00</td>
+<td class="p-3 data-cell text-primary-container">false</td>
+</tr>
+<tr class="data-row">
+<td class="p-3 data-cell text-center text-white/30">3</td>
+<td class="p-3 data-cell text-secondary-fixed-dim">48291</td>
+<td class="p-3 data-cell">2023-10-01T14:24:45Z</td>
+<td class="p-3 data-cell text-tertiary">"purchase"</td>
+<td class="p-3 data-cell">899.50</td>
+<td class="p-3 data-cell text-error font-bold">true</td>
+</tr>
+<tr class="data-row">
+<td class="p-3 data-cell text-center text-white/30">4</td>
+<td class="p-3 data-cell text-secondary-fixed-dim">22045</td>
+<td class="p-3 data-cell">2023-10-01T14:25:00Z</td>
+<td class="p-3 data-cell text-tertiary">"login"</td>
+<td class="p-3 data-cell bg-error-container/20 text-error/70 italic relative">
+                                    NaN
+                                    <div class="absolute inset-0 border border-error/30 pointer-events-none"></div>
+</td>
+<td class="p-3 data-cell text-primary-container">false</td>
+</tr>
+<tr class="data-row">
+<td class="p-3 data-cell text-center text-white/30">5</td>
+<td class="p-3 data-cell text-secondary-fixed-dim">48291</td>
+<td class="p-3 data-cell">2023-10-01T14:23:01Z</td>
+<td class="p-3 data-cell text-tertiary">"purchase"</td>
+<td class="p-3 data-cell">145.99</td>
+<td class="p-3 data-cell text-primary-container">false</td>
+</tr>
+<tr class="data-row">
+<td class="p-3 data-cell text-center text-white/30">6</td>
+<td class="p-3 data-cell text-secondary-fixed-dim">10042</td>
+<td class="p-3 data-cell">2023-10-01T14:23:05Z</td>
+<td class="p-3 data-cell text-tertiary">"login"</td>
+<td class="p-3 data-cell">12.00</td>
+<td class="p-3 data-cell text-primary-container">false</td>
+</tr>
+<tr class="data-row">
+<td class="p-3 data-cell text-center text-white/30">7</td>
+<td class="p-3 data-cell text-secondary-fixed-dim">99301</td>
+<td class="p-3 data-cell">2023-10-01T14:23:12Z</td>
+<td class="p-3 data-cell text-tertiary">"view"</td>
+<td class="p-3 data-cell bg-error-container/20 text-error/70 italic relative">
+                                    NaN
+                                    <div class="absolute inset-0 border border-error/30 pointer-events-none"></div>
+</td>
+<td class="p-3 data-cell text-primary-container">false</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</main>
+</div>
+</body></html>

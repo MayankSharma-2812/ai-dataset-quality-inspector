@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AegisData AI - Distribution Drift</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#03b5d3",
+                    "on-primary": "#1000a9",
+                    "surface-container-low": "#131b2e",
+                    "surface-container": "#171f33",
+                    "secondary-fixed-dim": "#4cd7f6",
+                    "error-container": "#93000a",
+                    "surface-bright": "#31394d",
+                    "outline-variant": "#464554",
+                    "inverse-surface": "#dae2fd",
+                    "on-secondary": "#003640",
+                    "error": "#ffb4ab",
+                    "on-primary-fixed-variant": "#2f2ebe",
+                    "tertiary-fixed-dim": "#ffb783",
+                    "on-error": "#690005",
+                    "on-secondary-fixed-variant": "#004e5c",
+                    "surface-variant": "#2d3449",
+                    "inverse-primary": "#494bd6",
+                    "surface-container-highest": "#2d3449",
+                    "on-primary-fixed": "#07006c",
+                    "surface-dim": "#0b1326",
+                    "on-primary-container": "#0d0096",
+                    "on-tertiary": "#4f2500",
+                    "on-surface-variant": "#c7c4d7",
+                    "primary-container": "#8083ff",
+                    "on-surface": "#dae2fd",
+                    "background": "#0b1326",
+                    "surface-container-lowest": "#060e20",
+                    "on-tertiary-fixed-variant": "#703700",
+                    "on-background": "#dae2fd",
+                    "inverse-on-surface": "#283044",
+                    "on-tertiary-fixed": "#301400",
+                    "surface": "#0b1326",
+                    "outline": "#908fa0",
+                    "surface-container-high": "#222a3d",
+                    "tertiary-fixed": "#ffdcc5",
+                    "on-secondary-container": "#00424e",
+                    "on-error-container": "#ffdad6",
+                    "on-tertiary-container": "#452000",
+                    "on-secondary-fixed": "#001f26",
+                    "surface-tint": "#c0c1ff",
+                    "tertiary-container": "#d97721",
+                    "tertiary": "#ffb783",
+                    "primary": "#c0c1ff",
+                    "primary-fixed": "#e1e0ff",
+                    "primary-fixed-dim": "#c0c1ff",
+                    "secondary-fixed": "#acedff",
+                    "secondary": "#4cd7f6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "16px",
+                    "container-max": "1440px",
+                    "base": "4px",
+                    "margin-desktop": "32px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "headline-lg": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "data-display": [
+                            "JetBrains Mono"
+                    ],
+                    "label-sm": [
+                            "JetBrains Mono"
+                    ],
+                    "headline-md": [
+                            "Plus Jakarta Sans"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-lg": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "data-display": [
+                            "18px",
+                            {
+                                    "lineHeight": "1.4",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "label-sm": [
+                            "12px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.3",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "1.5",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        /* Ambient Background Orbs */
+        .ambient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .orb-1 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, theme('colors.primary'), transparent 70%);
+            top: -200px;
+            right: -100px;
+        }
+        .orb-2 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, theme('colors.secondary'), transparent 70%);
+            bottom: -100px;
+            left: 200px;
+        }
+        
+        /* Glass Panel Styling */
+        .glass-panel {
+            background-color: rgba(23, 31, 51, 0.6); /* surface-container */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-panel:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Chart Glow Lines */
+        .chart-line-reference {
+            stroke: theme('colors.primary');
+            stroke-width: 2;
+            stroke-dasharray: 4 4;
+            filter: drop-shadow(0 0 4px rgba(192, 193, 255, 0.5)); /* primary */
+        }
+        .chart-line-current {
+            stroke: theme('colors.secondary');
+            stroke-width: 2;
+            filter: drop-shadow(0 0 6px rgba(76, 215, 246, 0.8)); /* secondary */
+        }
+        .chart-area-current {
+            fill: url(#gradient-secondary);
+            opacity: 0.2;
+        }
+        
+        /* Input Glow */
+        .input-glow:focus-within {
+            border-color: theme('colors.secondary');
+            box-shadow: 0 0 0 1px theme('colors.secondary');
+        }
+
+        /* Material Icon Base */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md min-h-screen flex antialiased">
+<!-- Ambient Background -->
+<div class="ambient-orb orb-1"></div>
+<div class="ambient-orb orb-2"></div>
+<!-- SideNavBar (Shared Component) -->
+<nav class="fixed left-0 top-0 h-full w-64 flex flex-col py-6 bg-surface-container/60 backdrop-blur-md border-r border-white/10 shadow-xl z-40 hidden md:flex">
+<!-- Header -->
+<div class="px-6 mb-8 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg relative overflow-hidden">
+<span class="material-symbols-outlined text-background text-sm font-bold z-10" data-icon="memory">memory</span>
+<div class="absolute inset-0 bg-white/20 animate-pulse"></div>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-black text-secondary tracking-tight">AegisData AI</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mt-1 opacity-80">Precision Observability</p>
+</div>
+</div>
+<!-- Navigation Tabs -->
+<div class="flex-1 px-4 space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 rounded-lg transition-colors font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Overview
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 rounded-lg transition-colors font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+                Missingness
+            </a>
+<!-- Active Tab -->
+<a class="flex items-center gap-3 bg-secondary-container/20 text-secondary-fixed-dim border-r-2 border-secondary p-3 rounded-r-lg font-body-md text-body-md translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined fill" data-icon="analytics" data-weight="fill">analytics</span>
+                Distribution Drift
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 rounded-lg transition-colors font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="balance">balance</span>
+                Bias/Fairness
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 rounded-lg transition-colors font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="database">database</span>
+                Raw Data Explorer
+            </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-3 hover:bg-white/5 hover:text-on-surface hover:backdrop-brightness-125 rounded-lg transition-colors font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="auto_fix_high">auto_fix_high</span>
+                AI Remediation
+            </a>
+</div>
+<!-- CTA & Footer -->
+<div class="px-6 mt-auto">
+<button class="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary-fixed hover:to-secondary-fixed text-background font-body-md text-body-md font-semibold py-2.5 px-4 rounded-lg shadow-[0_0_15px_rgba(3,181,211,0.3)] transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 mb-6">
+<span class="material-symbols-outlined text-sm" data-icon="play_arrow">play_arrow</span>
+                Run New Audit
+            </button>
+<div class="space-y-1">
+<a class="flex items-center gap-3 text-on-surface-variant p-2 hover:bg-white/5 hover:text-on-surface rounded-lg transition-colors font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="help">help</span>
+                    Help
+                </a>
+<a class="flex items-center gap-3 text-on-surface-variant p-2 hover:bg-white/5 hover:text-on-surface rounded-lg transition-colors font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="logout">logout</span>
+                    Logout
+                </a>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-64 relative flex flex-col min-h-screen max-w-container-max mx-auto w-full">
+<!-- TopNavBar (Shared Component) -->
+<header class="sticky top-0 w-full z-50 flex justify-between items-center px-margin-desktop h-16 bg-surface-container-low/60 backdrop-blur-md border-b border-white/10 shadow-sm">
+<div class="flex items-center gap-4">
+<div class="font-headline-md text-headline-md font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary tracking-tight">
+                    AegisData v2.0
+                </div>
+</div>
+<!-- Global Search (Left aligned relative to trailing actions) -->
+<div class="flex-1 max-w-md ml-8 mr-auto relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-secondary transition-colors" data-icon="search">search</span>
+<input class="w-full bg-surface-dim/80 border border-white/10 rounded-full py-1.5 pl-10 pr-4 text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/50 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all" placeholder="Search metrics, models, or features..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center gap-1">
+<a class="px-3 py-1.5 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors font-body-md text-body-md" href="#">Docs</a>
+<a class="px-3 py-1.5 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors font-body-md text-body-md" href="#">Support</a>
+<a class="px-3 py-1.5 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-colors font-body-md text-body-md" href="#">CLI</a>
+</div>
+<div class="flex items-center gap-2 border-l border-white/10 pl-6">
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 rounded-full transition-colors relative group">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-secondary rounded-full animate-pulse"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-on-surface hover:bg-white/5 rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</button>
+</div>
+<div class="flex items-center gap-3 border-l border-white/10 pl-6">
+<a class="text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm transition-colors" href="#">GitHub</a>
+<button class="border border-white/20 hover:border-white/40 text-on-surface font-label-sm text-label-sm py-1.5 px-3 rounded-md transition-colors">API Settings</button>
+<div class="w-8 h-8 rounded-full bg-surface-bright border border-white/20 overflow-hidden ml-2 cursor-pointer hover:border-primary transition-colors">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="A macro photograph of an abstract, futuristic neural network node glowing in soft blues and purples. The node is suspended in a dark, sleek cybernetic environment, emphasizing precision, technology, and a premium enterprise aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrIz59Ap8j8drZRy5OXBEbHYvcCtZWrRK4gnf_oEuoYEXCOqDYa4GGj-umY86XTqRVB914eWQt61qaC-fa3xeSZLv6AyZOe15nzY-J7CH1qm0KMkstpv3gqnKYuKyTv75_K9G1_mM5syMMY5e76SBxRGv98rXhpmttd2iI48KVhQRSdfiJOJ_DLkgRqnap2uc-R1M1kWySUEaoK9iJPv_QgH1UR3J0DHkpXUxGLK-occrEd0mx5nEd"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Dashboard Canvas -->
+<div class="p-margin-mobile md:p-margin-desktop flex-1 flex flex-col gap-gutter max-w-7xl mx-auto w-full">
+<!-- Drift Summary Banner -->
+<div class="glass-panel rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-l-4 border-l-error">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-error/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-error" data-icon="warning">warning</span>
+</div>
+<div>
+<h2 class="font-headline-md text-body-lg font-semibold text-on-surface flex items-center gap-2">
+                            Distribution Drift Detected
+                            <span class="px-2 py-0.5 rounded text-[10px] font-data-display text-data-display font-bold bg-error-container text-on-error uppercase tracking-wider">Status: Drifting</span>
+</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Significant divergence found between Reference (v1.4) and Current (v2.0-live) datasets across 3 high-impact features.</p>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 rounded-lg border border-white/10 hover:border-white/30 text-on-surface font-body-md text-body-md transition-colors bg-surface-dim/50">View Logs</button>
+<button class="px-4 py-2 rounded-lg bg-error hover:bg-error/90 text-on-error font-body-md text-body-md font-medium transition-colors shadow-[0_0_10px_rgba(255,180,171,0.2)]">Remediate AI</button>
+</div>
+</div>
+<!-- Main Layout Grid (Bento style) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: Upload Zones & Feature Cards -->
+<div class="lg:col-span-4 flex flex-col gap-gutter">
+<!-- Dual Upload Zone -->
+<div class="glass-panel rounded-xl p-6 flex flex-col gap-4">
+<h3 class="font-body-lg text-body-lg font-semibold text-on-surface border-b border-white/5 pb-2">Dataset Source</h3>
+<div class="space-y-4">
+<!-- Reference Upload -->
+<div class="relative group cursor-pointer input-glow">
+<input aria-label="Upload reference dataset" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" type="file"/>
+<div class="border-2 border-dashed border-white/10 group-hover:border-primary/50 rounded-lg p-4 flex items-center gap-3 bg-surface-dim/30 transition-colors">
+<div class="w-8 h-8 rounded bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-sm" data-icon="folder_zip">folder_zip</span>
+</div>
+<div class="flex-1">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-0.5">Reference Dataset</p>
+<p class="font-data-display text-[11px] text-primary truncate">training_v1.4_clean.csv</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors text-sm" data-icon="upload">upload</span>
+</div>
+</div>
+<!-- Current Upload -->
+<div class="relative group cursor-pointer input-glow">
+<input aria-label="Upload current dataset" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" type="file"/>
+<div class="border-2 border-dashed border-white/10 group-hover:border-secondary/50 rounded-lg p-4 flex items-center gap-3 bg-surface-dim/30 transition-colors">
+<div class="w-8 h-8 rounded bg-secondary/10 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-sm" data-icon="dataset">dataset</span>
+</div>
+<div class="flex-1">
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-0.5">Current Dataset</p>
+<p class="font-data-display text-[11px] text-secondary truncate">prod_stream_aug24.parquet</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-secondary transition-colors text-sm" data-icon="upload">upload</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Feature Drift Cards -->
+<div class="glass-panel rounded-xl p-0 flex flex-col overflow-hidden">
+<div class="p-4 border-b border-white/5 bg-surface-dim/20 flex justify-between items-center">
+<h3 class="font-body-lg text-body-lg font-semibold text-on-surface">Feature Drift Rank</h3>
+<button class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span></button>
+</div>
+<div class="flex-1 overflow-y-auto max-h-[400px]">
+<!-- Card 1 (Active/Severe) -->
+<div class="p-4 border-b border-white/5 bg-white/5 border-l-2 border-l-secondary cursor-pointer hover:bg-white/10 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<p class="font-data-display text-sm font-semibold text-on-surface">user_engagement_score</p>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-data-display text-data-display font-bold bg-error/20 text-error uppercase">Severe</span>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-3">
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">PSI</p>
+<p class="font-data-display text-sm text-error">0.245</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">KS p-value</p>
+<p class="font-data-display text-sm text-on-surface">0.002</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">JS Div</p>
+<p class="font-data-display text-sm text-on-surface">0.18</p>
+</div>
+</div>
+</div>
+<!-- Card 2 (Warning) -->
+<div class="p-4 border-b border-white/5 cursor-pointer hover:bg-white/5 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<p class="font-data-display text-sm font-medium text-on-surface-variant">session_duration_min</p>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-data-display text-data-display font-bold bg-tertiary/20 text-tertiary uppercase">Warn</span>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-3 opacity-80">
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">PSI</p>
+<p class="font-data-display text-sm text-tertiary">0.112</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">KS p-value</p>
+<p class="font-data-display text-sm text-on-surface">0.041</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">JS Div</p>
+<p class="font-data-display text-sm text-on-surface">0.09</p>
+</div>
+</div>
+</div>
+<!-- Card 3 (Stable) -->
+<div class="p-4 cursor-pointer hover:bg-white/5 transition-colors">
+<div class="flex justify-between items-start mb-2">
+<p class="font-data-display text-sm font-medium text-on-surface-variant">transaction_amt</p>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-data-display text-data-display font-bold bg-white/10 text-on-surface-variant uppercase">Stable</span>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-3 opacity-60">
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">PSI</p>
+<p class="font-data-display text-sm text-on-surface">0.045</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">KS p-value</p>
+<p class="font-data-display text-sm text-on-surface">0.682</p>
+</div>
+<div>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider mb-1">JS Div</p>
+<p class="font-data-display text-sm text-on-surface">0.02</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Visualization -->
+<div class="lg:col-span-8 flex flex-col">
+<div class="glass-panel rounded-xl p-6 flex-1 flex flex-col relative overflow-hidden min-h-[500px]">
+<!-- Header / Legend -->
+<div class="flex justify-between items-start mb-8 relative z-10">
+<div>
+<h3 class="font-headline-md text-headline-md font-semibold text-on-surface flex items-center gap-2">
+<span class="font-data-display">user_engagement_score</span>
+</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Probability density function comparison over 30 days.</p>
+</div>
+<div class="flex gap-4 bg-surface-dim/50 rounded-lg p-2 border border-white/5">
+<div class="flex items-center gap-2">
+<div class="w-4 h-0.5 bg-primary border border-primary border-dashed"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Reference</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-4 h-0.5 bg-secondary shadow-[0_0_4px_#4cd7f6]"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Current</span>
+</div>
+</div>
+</div>
+<!-- Chart Canvas (Simulated SVG) -->
+<div class="flex-1 relative w-full h-full min-h-[300px]">
+<!-- Simulated Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+<div class="w-full h-px bg-white/5"></div>
+<div class="w-full h-px bg-white/5"></div>
+<div class="w-full h-px bg-white/5"></div>
+<div class="w-full h-px bg-white/5"></div>
+<div class="w-full h-px bg-white/10"></div> <!-- Baseline -->
+</div>
+<svg class="w-full h-full absolute inset-0 overflow-visible" preserveaspectratio="none" viewbox="0 0 1000 300">
+<defs>
+<lineargradient id="gradient-secondary" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#4cd7f6" stop-opacity="0.4"></stop>
+<stop offset="100%" stop-color="#4cd7f6" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<!-- Reference Distribution (Indigo Dashed) -->
+<path class="chart-line-reference" d="M 0,280 C 100,280 200,270 300,200 C 400,100 500,50 600,150 C 700,250 800,275 900,280 L 1000,280" fill="none"></path>
+<!-- Current Distribution (Cyan Solid + Area) -->
+<path class="chart-area-current" d="M 0,280 C 150,280 250,260 350,150 C 450,40 550,20 650,180 C 750,260 850,278 950,280 L 1000,280 L 1000,300 L 0,300 Z"></path>
+<path class="chart-line-current" d="M 0,280 C 150,280 250,260 350,150 C 450,40 550,20 650,180 C 750,260 850,278 950,280 L 1000,280" fill="none"></path>
+<!-- Highlight/Tooltip Line -->
+<line stroke="rgba(255,255,255,0.2)" stroke-dasharray="2 2" stroke-width="1" x1="480" x2="480" y1="20" y2="300"></line>
+<circle cx="480" cy="30" fill="#4cd7f6" r="4"></circle>
+<circle cx="480" cy="118" fill="#c0c1ff" r="4"></circle>
+</svg>
+<!-- Custom X-Axis Labels -->
+<div class="absolute bottom-[-24px] left-0 w-full flex justify-between text-[10px] font-data-display text-on-surface-variant opacity-60 px-2">
+<span>-3.0</span>
+<span>-1.5</span>
+<span>0.0</span>
+<span>1.5</span>
+<span>3.0</span>
+</div>
+</div>
+<!-- Floating Metric Box -->
+<div class="absolute top-24 right-8 bg-surface-container-high/90 backdrop-blur-md border border-white/10 rounded-lg p-3 shadow-lg z-20 pointer-events-none">
+<p class="font-data-display text-[10px] text-on-surface-variant uppercase mb-2">At x = -0.42</p>
+<div class="flex items-center justify-between gap-6 mb-1">
+<span class="flex items-center gap-1 text-[11px] font-body-md text-on-surface"><div class="w-2 h-2 rounded-full bg-secondary"></div> Current</span>
+<span class="font-data-display text-xs text-secondary">0.68</span>
+</div>
+<div class="flex items-center justify-between gap-6">
+<span class="flex items-center gap-1 text-[11px] font-body-md text-on-surface"><div class="w-2 h-2 rounded-full bg-primary"></div> Ref</span>
+<span class="font-data-display text-xs text-primary">0.41</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
